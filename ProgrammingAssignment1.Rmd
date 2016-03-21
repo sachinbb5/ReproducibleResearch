@@ -28,7 +28,7 @@ hist(stepsByDay$steps, main= "Total steps by day")
 meanByDay <- mean(stepsByDay$steps)
 medianByDay <- median(stepsByDay$steps)
 
-#The mean  of total number of steps <!--rinline meanByDay --> and the median is <!-- rinline medianByDay --> 
+#The mean  of total number of steps <!--rinline meanByDay --> and the median is <!-- rinline medianByDay -->  
 
 ##What is the average daily activity pattern?
 #Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
@@ -63,5 +63,33 @@ actMS$steps[idNAs] <- sapply(actMS[idNAs,"interval"],
                                      intervals[id,"steps"]
                                    } ) 
 
+#Histogram of the total number of steps taken each day after imputing
+stepsByDayImp <- aggregate(steps ~ date, data=actMS, FUN = sum)
+hist(stepsByDayImp$steps, breaks=seq(0,26000,2000), 
+     main = "Histogram of Total-Steps per day", xlab="Total Steps")
+
+
+#The mean and median of the total number of steps taken per day after impuding
+
+meanByDayImp <- mean(stepsByDayImp$steps)
+medianByDayImp <- median(stepsByDayImp$steps)
+
+##Are there differences in activity patterns between weekdays and weekends?
+#For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
+#Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+
+library(timeDate)
+activityWD <- actMS
+activityWD$weekday   <- as.factor(weekdays(activityWD$date)) 
+isw <- gsub("TRUE", "weekday", as.character(isWeekday(activityWD$date)))
+activityWD$isweekday <- as.factor(gsub("FALSE", "weekend", isw))
+
+
+#Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+library(lattice)
+intervalsWD <- aggregate(steps ~ interval + isweekday, data=activityWD, FUN = mean)
+xyplot(steps ~ interval | isweekday, data = intervalsWD, 
+       layout = c(1, 2), type = "l", 
+       xlab = "Interval", ylab = "Number of steps")
 
 ```
